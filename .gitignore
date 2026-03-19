@@ -2,5 +2,6 @@
 /dependencies/*
 !/dependencies/glad/
 !/dependencies/glad/**
+!/dependencies/tiny_obj_loader.h
 **/.cache
 **/.DS_Store

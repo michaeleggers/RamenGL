@@ -8,6 +8,9 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
 
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
+
 static SDL_Window*   g_pWindow;
 static SDL_Renderer* g_pRenderer;
 static SDL_GLContext g_glContext;

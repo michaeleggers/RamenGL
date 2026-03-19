@@ -11,7 +11,9 @@ add_subdirectory(./dependencies/SDL EXCLUDE_FROM_ALL)
 
 add_executable(task01 
     ./dependencies/glad/src/glad.c
+    ./dependencies/tiny_obj_loader.h
     task01.cpp)
 target_include_directories(task01 PUBLIC
-./dependencies/glad/include)
+    ./dependencies/glad/include
+    ./dependencies/)
 target_link_libraries(task01 PRIVATE SDL3::SDL3)
