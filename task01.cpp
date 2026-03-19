@@ -2,6 +2,7 @@
 
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_video.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -64,6 +65,81 @@ File ReadFile(const char* file)
     return File{ data, size };
 }
 
+struct Vec3f
+{
+    float x, y, z;
+};
+
+struct Vertex
+{
+    union
+    {
+        Vec3f position;
+        float positions[ 3 ];
+    };
+
+    const float operator[](const int index) const
+    {
+        assert(index < 3);
+        return positions[ index ];
+    }
+
+    float& operator[](const int index)
+    {
+        return positions[ index ];
+    }
+};
+
+class Shader
+{
+  public:
+    bool Load(const char* vertShaderSource, const char* fragShaderSource)
+    {
+        if ( !FileExists(vertShaderSource) )
+        {
+            fprintf(stderr, "Shader file: '%s' does not exist.\n", vertShaderSource);
+            return false;
+        }
+
+        /* Read shader source from disk and compile. */
+        File   shaderData = ReadFile(vertShaderSource);
+        GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertShader, 1, &shaderData.data, nullptr);
+        glCompileShader(vertShader);
+        if ( !IsCompiled(vertShader) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    bool IsCompiled(GLuint shader)
+    {
+        GLint status;
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+        if ( status != GL_TRUE )
+        {
+            char buffer[ 512 ];
+            memset(buffer, 0, 512);
+            glGetShaderInfoLog(shader, 511, nullptr, buffer);
+            printf("GLSL compile error:\n%s\n", buffer);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    void Use()
+    {
+        glUseProgram(m_Program);
+    }
+
+  private:
+    GLuint m_Program;
+};
+
 class Model
 {
   public:
@@ -74,27 +150,78 @@ class Model
             return false;
         }
 
-        File modelFile = ReadFile(file);
-        printf("%s", modelFile.data);
+        File              modelFile = ReadFile(file);
+        tinyobj::attrib_t attrib;
+        std::string       err;
+        bool              ret = tinyobj::LoadObj(&attrib, &m_Shapes, nullptr, &err, file, "/");
+        if ( !ret )
+        {
+            return false;
+        }
+
+        printf("loaded: '%s'\n", file);
+        printf("# of vertices: %d\n", (int)(attrib.vertices.size()) / 3);
+        printf("# of normals: %d\n", (int)(attrib.normals.size() / 3));
+        printf("# of texcoords: %d\n", (int)attrib.texcoords.size() / 2);
+        printf("# of shapes: %d\n", (int)m_Shapes.size());
+
+        for ( int i = 0; i < m_Shapes.size(); i++ )
+        {
+            for ( int j = 0; j < m_Shapes[ i ].mesh.indices.size(); j++ )
+            {
+                Vertex v{};
+                for ( int k = 0; k < 3; k++ )
+                {
+                    tinyobj::index_t idx = m_Shapes[ i ].mesh.indices[ j ];
+
+                    float component = attrib.vertices[ idx.vertex_index ];
+                    v[ k ]          = component;
+                }
+                m_Vertices.push_back(v);
+            }
+        }
+        printf("m_Vertices.size(): %lu\n", m_Vertices.size());
+
+        UploadToGPU();
+
         modelFile.Destroy();
 
         return true;
     }
 
+    const GLuint GetBuffer()
+    {
+        return m_Buffer;
+    }
+
+    const size_t NumVertices()
+    {
+        return m_Vertices.size();
+    }
+
+  private:
+    void UploadToGPU()
+    {
+        glCreateBuffers(1, &m_Buffer);
+        glNamedBufferData(m_Buffer, m_Vertices.size() * sizeof(Vertex), m_Vertices.data(), GL_STATIC_DRAW);
+    }
+
+    void UnloadFromGPU()
+    {
+        if ( m_Buffer != 0 )
+        {
+            glDeleteBuffers(1, &m_Buffer);
+        }
+    }
+
   private:
     std::vector<tinyobj::shape_t> m_Shapes;
+    std::vector<Vertex>           m_Vertices;
+    GLuint                        m_Buffer;
 };
 
 int main(int argc, char** argv)
 {
-    Model model{};
-    if ( !model.Load("./models/cylinder.obj") )
-    {
-        fprintf(stderr, "Could not load model file.\n");
-    }
-
-    exit(1);
-
     if ( !SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) )
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not initialize SDL. Reason: %s\n", SDL_GetError());
@@ -135,9 +262,23 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    // Print GL Version
+    /* Print GL version */
     printf("Got OpenGL Version: %s\n", glGetString(GL_VERSION));
     printf("Got OpenGL Renderer: %s\n", glGetString(GL_RENDERER));
+
+    /* Load shaders. */
+    Shader shader{};
+    if ( !shader.Load("./shaders/task01.vert", "./shaders/task01.frag") )
+    {
+        fprintf(stderr, "Could not load shader.\n");
+    }
+
+    /* Create a model on GPU */
+    Model model{};
+    if ( !model.Load("./models/cylinder.obj") )
+    {
+        fprintf(stderr, "Could not load model file.\n");
+    }
 
     bool isRunning = true;
     SDL_GL_SetSwapInterval(1); /* 1 = VSync enabledm 0 = VSync disabled */
@@ -155,6 +296,11 @@ int main(int argc, char** argv)
         /* Rendering */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(1.0f, 0.95f, 0.0f, 1.0f);
+
+        shader.Use();
+        glBindBuffer(GL_ARRAY_BUFFER, model.GetBuffer());
+        glDrawArrays(GL_TRIANGLES, 0, model.NumVertices());
+
         SDL_GL_SwapWindow(g_pWindow);
     }
 
