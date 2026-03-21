@@ -68,153 +68,123 @@ File ReadFile(const char* file)
 
 struct Vec3f
 {
-    float components[ 3 ];
+    float x;
+    float y;
+    float z;
 
     Vec3f(float _x, float _y, float _z)
     {
-        components[ 0 ] = _x;
-        components[ 1 ] = _y;
-        components[ 2 ] = _z;
+        x = _x;
+        y = _y;
+        z = _z;
     }
 
     Vec3f(float s)
     {
-        components[ 0 ] = s;
-        components[ 1 ] = s;
-        components[ 2 ] = s;
+        x = s;
+        y = s;
+        z = s;
     }
 
     Vec3f()
     {
-        components[ 0 ] = 0.0f;
-        components[ 1 ] = 0.0f;
-        components[ 2 ] = 0.0f;
-    }
-
-    const float& x() const
-    {
-        return components[ 0 ];
-    }
-
-    const float& y() const
-    {
-        return components[ 1 ];
-    }
-
-    const float& z() const
-    {
-        return components[ 2 ];
+        x = 0.0f;
+        y = 0.0f;
+        z = 0.0f;
     }
 
     const float operator[](const int index) const
     {
         assert(index < 3);
-        return components[ index ];
+        return (&x)[ index ];
     }
 
     float& operator[](const int index)
     {
         assert(index < 3);
-        return components[ index ];
+        return (&x)[ index ];
     }
 
     Vec3f operator-(const Vec3f& right) const
     {
-        return Vec3f{ x() - right.x(), y() - right.y(), z() - right.z() };
+        return Vec3f{ x - right.x, y - right.y, z - right.z };
     }
 
     Vec3f operator+(const Vec3f& right) const
     {
-        return Vec3f{ x() + right.x(), y() + right.y(), z() + right.z() };
+        return Vec3f{ x + right.x, y + right.y, z + right.z };
     }
 
     Vec3f operator/(float s) const
     {
-        return Vec3f{ x() / s, y() / s, z() / s };
+        return Vec3f{ x / s, y / s, z / s };
     }
 };
 
 struct Vec4f
 {
-    float components[ 4 ];
+    float x;
+    float y;
+    float z;
+    float w;
 
     Vec4f(float _x, float _y, float _z, float _w)
     {
-        components[ 0 ] = _x;
-        components[ 1 ] = _y;
-        components[ 2 ] = _z;
-        components[ 3 ] = _w;
+        x = _x;
+        y = _y;
+        z = _z;
+        w = _w;
     }
 
     Vec4f(float s)
     {
-        components[ 0 ] = s;
-        components[ 1 ] = s;
-        components[ 2 ] = s;
-        components[ 3 ] = s;
+        x = s;
+        y = s;
+        z = s;
+        w = s;
     }
 
     Vec4f()
     {
-        components[ 0 ] = 0.0f;
-        components[ 1 ] = 0.0f;
-        components[ 2 ] = 0.0f;
-        components[ 3 ] = 0.0f;
+        x = 0.0f;
+        y = 0.0f;
+        z = 0.0f;
+        w = 0.0f;
     }
 
     Vec4f(const Vec3f& v3)
     {
-        components[ 0 ] = v3.x();
-        components[ 1 ] = v3.y();
-        components[ 2 ] = v3.z();
-        components[ 3 ] = 1.0f;
+        x = v3.x;
+        y = v3.y;
+        z = v3.z;
+        w = 1.0f;
     }
 
-    const float& x() const
-    {
-        return components[ 0 ];
-    }
-
-    const float& y() const
-    {
-        return components[ 1 ];
-    }
-
-    const float& z() const
-    {
-        return components[ 2 ];
-    }
-
-    const float& w() const
-    {
-        return components[ 3 ];
-    }
-
-    const float operator[](const int index) const
+    const float& operator[](const int index) const
     {
         assert(index < 4);
-        return components[ index ];
+        return (&x)[ index ];
     }
 
     Vec4f operator-(const Vec4f& right) const
     {
-        return Vec4f{ x() - right.x(), y() - right.y(), z() - right.z(), w() - right.w() };
+        return Vec4f{ x - right.x, y - right.y, z - right.z, w - right.w };
     }
 
     Vec4f operator+(const Vec4f& right) const
     {
-        return Vec4f{ x() + right.x(), y() + right.y(), z() + right.z(), w() + right.w() };
+        return Vec4f{ x + right.x, y + right.y, z + right.z, w + right.w };
     }
 
     float& operator[](const int index)
     {
         assert(index < 4);
-        return components[ index ];
+        return (&x)[ index ];
     }
 
     Vec4f operator/(float s) const
     {
-        return Vec4f{ x() / s, y() / s, z() / s, w() / s };
+        return Vec4f{ x / s, y / s, z / s, w / s };
     }
 };
 
@@ -238,6 +208,20 @@ struct Mat4f
         columns[ 3 ] = col4;
     }
 
+    /* Follows mathematical notation:
+     * i = row, j = column.
+     */
+    const float& operator()(int i, int j)
+    {
+        const Vec4f& col = columns[ j ];
+        return col[ i ];
+    }
+
+    const Vec4f& operator[](int col)
+    {
+        return columns[ col ];
+    }
+
     static Mat4f Identity()
     {
         return Mat4f{ Vec4f{ 1.0f, 0.0f, 0.0f, 0.0f },
@@ -248,7 +232,7 @@ struct Mat4f
 
     const float* Data()
     {
-        return (float*)columns[ 0 ].components;
+        return (float*)(&columns[ 0 ].x);
     }
 
     const char* ToString() const
@@ -256,39 +240,39 @@ struct Mat4f
         static char buffer[ 256 ];
         sprintf(buffer,
                 "%.2f, %.2f, %.2f, %.2f\n%.2f, %.2f, %.2f, %.2f\n%.2f, %.2f, %.2f, %.2f\n%.2f, %.2f, %.2f, %.2f\n",
-                columns[ 0 ].x(),
-                columns[ 1 ].x(),
-                columns[ 2 ].x(),
-                columns[ 3 ].x(),
-                columns[ 0 ].y(),
-                columns[ 1 ].y(),
-                columns[ 2 ].y(),
-                columns[ 3 ].y(),
-                columns[ 0 ].z(),
-                columns[ 1 ].z(),
-                columns[ 2 ].z(),
-                columns[ 3 ].z(),
-                columns[ 0 ].w(),
-                columns[ 1 ].w(),
-                columns[ 2 ].w(),
-                columns[ 3 ].w());
+                columns[ 0 ].x,
+                columns[ 1 ].x,
+                columns[ 2 ].x,
+                columns[ 3 ].x,
+                columns[ 0 ].y,
+                columns[ 1 ].y,
+                columns[ 2 ].y,
+                columns[ 3 ].y,
+                columns[ 0 ].z,
+                columns[ 1 ].z,
+                columns[ 2 ].z,
+                columns[ 3 ].z,
+                columns[ 0 ].w,
+                columns[ 1 ].w,
+                columns[ 2 ].w,
+                columns[ 3 ].w);
         return buffer;
     }
 };
 
 Vec3f Cross(const Vec3f& a, const Vec3f& b)
 {
-    return Vec3f{ a.y() * b.z() - a.z() * b.y(), a.z() * b.x() - a.x() * b.z(), a.x() * b.y() - a.y() * b.x() };
+    return Vec3f{ a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
 }
 
 float Length(const Vec3f& v)
 {
-    return sqrt(v.x() * v.x() + v.y() * v.y() + v.z() * v.z());
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
 float Length(const Vec4f& v)
 {
-    return sqrt(v.x() * v.x() + v.y() * v.y() + v.z() * v.z() + v.w() * v.w());
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
 }
 
 Vec3f Normalize(const Vec3f& v)
@@ -306,6 +290,8 @@ Vec4f Normalize(const Vec4f& v)
 Mat4f Inverse(const Mat4f& m)
 {
     Mat4f result{};
+
+    // const Vec3f& a = Vec3f(m[ 0 ]);
 
     return result;
 }
@@ -662,7 +648,7 @@ int main(int argc, char** argv)
     Mat4f modelMat = Mat4f::Identity();
 
     /* View mat */
-    Mat4f viewMat = LookAt(camera);
+    Mat4f viewMat = Mat4f::Identity(); //LookAt(camera);
 #if 1
     printf("viewMat: \n%s\n", viewMat.ToString());
     const float* viewMatData = viewMat.Data();
