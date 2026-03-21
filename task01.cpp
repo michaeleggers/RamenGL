@@ -639,7 +639,13 @@ int main(int argc, char** argv)
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
 
-    // TODO: Setup imgui scaling.
+    /* ImGUI scaling */
+    float       mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+    ImGuiStyle& style     = ImGui::GetStyle();
+    style.ScaleAllSizes(
+        mainScale); // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
+    style.FontScaleDpi
+        = mainScale; // Set initial font scale. (in docking branch: using io.ConfigDpiScaleFonts=true automatically overrides this for every window depending on the current monitor)
 
     /* Setup Platform/Renderer backends */
     ImGui_ImplSDL3_InitForOpenGL(g_pWindow, g_glContext);
@@ -709,9 +715,10 @@ int main(int argc, char** argv)
     while ( isRunning )
     {
         SDL_Event e;
-        ImGui_ImplSDL3_ProcessEvent(&e);
         while ( SDL_PollEvent(&e) )
         {
+            ImGui_ImplSDL3_ProcessEvent(&e);
+
             if ( e.type == SDL_EVENT_QUIT )
             {
                 isRunning = false;
