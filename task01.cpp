@@ -245,6 +245,7 @@ struct Vec4f
 
 /* 4x4 Matrix with floats.
  * Stores elements in column major order.
+ * Constructors also expect data in columns!
  */
 struct Mat4f
 {
@@ -331,6 +332,20 @@ struct Mat4f
     Vec4f& operator[](int col)
     {
         return reinterpret_cast<Vec4f&>(e[ col ]);
+    }
+
+    void Transpose()
+    {
+        Mat4f result{};
+        for ( int i = 0; i < 4; i++ )
+        {
+            const Vec4f& col = this->operator[](i);
+            for ( int j = 0; j < 4; j++ )
+            {
+                result[ j ][ i ] = col[ j ];
+            }
+        }
+        *this = result;
     }
 
     static Mat4f Identity()
@@ -887,7 +902,7 @@ int main(int argc, char** argv)
 
     /* Model mat*/
     Mat4f modelMat = Scale(Vec3f{ 3.0f, 3.0f, 3.0f });
-    Translate(modelMat, Vec3f{ 0.0f, -10.0f, -20.0f }); //Mat4f::Identity();
+    Translate(modelMat, Vec3f{ 5.0f, -10.0f, -20.0f }); //Mat4f::Identity();
 
     /* View mat */
     Mat4f viewMat = Mat4f::Identity();
