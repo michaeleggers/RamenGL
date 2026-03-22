@@ -674,15 +674,33 @@ class Camera
         return Normalize(Cross(m_Forward, m_Up));
     }
 
+    /* Orient camera so that it looks at target. */
+    void Orient(const Vec3f target)
+    {
+        Vec3f newForward = Normalize(target - m_Position);
+        Vec3f newSide    = Normalize(Cross(newForward, Vec3f{ 0.0f, 1.0f, 0.0f }));
+        Vec3f newUp      = Normalize(Cross(newSide, newForward));
+    }
+
   private:
     Vec3f m_Position;
     Vec3f m_Forward;
     Vec3f m_Up;
 };
 
-Mat4f LookAt(const Camera& camera)
+Mat4f LookAt(const Vec3f& position, const Vec3f& target, const Vec3f& up)
 {
-    return Inverse(Mat4f{ camera.GetRight(), camera.GetUp(), -camera.GetForward(), camera.GetPosition() });
+    Vec3f t       = -position;
+    Vec3f forward = Normalize(target - position);
+    Vec3f right   = Cross(forward, Normalize(up));
+    Vec3f newUp   = Cross(right, forward);
+    Mat4f result  = Mat4f::Identity();
+    result[ 0 ]   = Vec4f{ right, 0.0f };
+    result[ 1 ]   = Vec4f{ newUp, 0.0f };
+    result[ 2 ]   = Vec4f{ -forward, 0.0f };
+    result.Transpose();
+    result[ 3 ] = Vec4f{ t, 1.0f };
+    return result;
 }
 
 /* Creates a right-handed, y-up, perspective projection matrix. */
@@ -898,14 +916,15 @@ int main(int argc, char** argv)
     CreateGeometry();
 
     /* Create camera */
-    Camera camera(Vec3f{ 0.0f, 0.0f, 10.0f }, Vec3f{ 0.0f, 0.0f, 0.0f });
+    Camera camera(Vec3f{ 0.0f, 20.0f, 10.0f }, Vec3f{ 0.0f, 0.0f, 0.0f });
 
     /* Model mat*/
     Mat4f modelMat = Scale(Vec3f{ 3.0f, 3.0f, 3.0f });
-    Translate(modelMat, Vec3f{ 5.0f, -10.0f, -20.0f }); //Mat4f::Identity();
+    Translate(modelMat, Vec3f{ 0.0f, 0.0f, -20.0f }); //Mat4f::Identity();
 
     /* View mat */
-    Mat4f viewMat = Mat4f::Identity();
+    Mat4f viewMat = LookAt(
+        camera.GetPosition(), camera.GetPosition() + camera.GetForward(), camera.GetUp()); // Mat4f::Identity();
 #if 1
     printf("viewMat: \n%s\n", viewMat.ToString());
     const float* viewMatData = viewMat.Data();
