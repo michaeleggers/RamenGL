@@ -2,5 +2,11 @@
 /dependencies/*
 !/dependencies/glad/
 !/dependencies/glad/**
+!/dependencies/tiny_obj_loader.h
+!/dependencies/imgui/
+!/dependencies/imgui/**
+imgui.ini
 **/.cache
+**/models/**
 **/.DS_Store
+**/*.zip

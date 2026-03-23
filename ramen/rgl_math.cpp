@@ -1,0 +1,214 @@
+#include "rgl_math.h"
+
+Vec3f::Vec3f(const Vec4f& v4)
+{
+    x = v4.x;
+    y = v4.y;
+    z = v4.z;
+}
+
+Vec3f Cross(const Vec3f& a, const Vec3f& b)
+{
+    return Vec3f{ a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
+}
+
+float Length(const Vec3f& v)
+{
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+float Length(const Vec4f& v)
+{
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
+}
+
+Vec3f Normalize(const Vec3f& v)
+{
+    float len = Length(v);
+    return v / len;
+}
+
+float Dot(const Vec3f& a, const Vec3f& b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+Vec4f Normalize(const Vec4f& v)
+{
+    float len = Length(v);
+    return v / len;
+}
+
+float Dot(const Vec4f& a, const Vec4f& b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+}
+
+/* Create Inverse of 4x4 Matrix.
+ * Code from 'Foundations of Game Engine programming Vol.1'
+ * by Eric Lengyel.
+ */
+Mat4f Inverse(const Mat4f& m)
+{
+    const Vec3f& a = reinterpret_cast<const Vec3f&>(m[ 0 ]);
+    const Vec3f& b = reinterpret_cast<const Vec3f&>(m[ 1 ]);
+    const Vec3f& c = reinterpret_cast<const Vec3f&>(m[ 2 ]);
+    const Vec3f& d = reinterpret_cast<const Vec3f&>(m[ 3 ]);
+
+    const float& x = m(3, 0);
+    const float& y = m(3, 1);
+    const float& z = m(3, 2);
+    const float& w = m(3, 3);
+
+    Vec3f s = Cross(a, b);
+    Vec3f t = Cross(c, d);
+    Vec3f u = a * y - b * x;
+    Vec3f v = c * w - d * z;
+
+    float invDet = 1.0f / (Dot(s, v) + Dot(t, u));
+    s *= invDet;
+    t *= invDet;
+    u *= invDet;
+    v *= invDet;
+
+    Vec3f r0 = Cross(b, v) + t * y;
+    Vec3f r1 = Cross(v, a) - t * x;
+    Vec3f r2 = Cross(d, u) + s * w;
+    Vec3f r3 = Cross(u, c) - s * z;
+
+    return Mat4f(r0.x,
+                 r0.y,
+                 r0.z,
+                 -Dot(b, t),
+                 r1.x,
+                 r1.y,
+                 r1.z,
+                 Dot(a, t),
+                 r2.x,
+                 r2.y,
+                 r2.z,
+                 -Dot(d, s),
+                 r3.x,
+                 r3.y,
+                 r3.z,
+                 Dot(c, s));
+}
+
+/* Builds a versor from given axis and rotation angle (in degrees), given in degrees.
+ * A versor is the expression of a rotation in a '4D rotational vector'.
+ * Note that this computes a unit-quaternion.
+ * Also note that mathematicians don't like it when we call Quaternions Vectors!
+ */
+Quat AngleAxis(const float& x, const float& y, const float& z, const float& angleDgr)
+{
+    Quat result{};
+
+    const float& angleRad     = TO_RAD(angleDgr);
+    const float& halfTheta    = angleRad * 0.5f;
+    const float& sinHalfTheta = sinf(halfTheta);
+    result.x                  = sinHalfTheta * x;
+    result.y                  = sinHalfTheta * y;
+    result.z                  = sinHalfTheta * z;
+    result.w                  = cosf(halfTheta);
+
+    return result;
+}
+
+Quat AngleAxis(const Vec3f& v, const float& angleDgr)
+{
+    return AngleAxis(v.x, v.y, v.z, angleDgr);
+}
+
+Mat4f AsMat4f(const Quat& qIn)
+{
+    Quat  q    = qIn;
+    float len2 = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+    if ( fabs(len2 - 1.0f) > RAMEN_QUAT_EPSILON )
+    {
+        q /= sqrt(len2);
+    }
+
+    const float& x  = q.x;
+    const float& y  = q.y;
+    const float& z  = q.z;
+    const float& w  = q.w;
+    const float  x2 = x * x;
+    const float  y2 = y * y;
+    const float  z2 = z * z;
+    const float  w2 = w * w;
+
+    return Mat4f{ Vec4f{ 1.0f - 2.0f * y2 - 2.0f * z2, 2.0f * x * y + 2.0f * w * z, 2.0f * x * z - 2.0f * w * y, 0.0f },
+                  Vec4f{ 2.0f * x * y - 2.0f * w * z, 1.0f - 2.0f * x2 - 2.0f * z2, 2.0f * y * z + 2.0f * w * x, 0.0f },
+                  Vec4f{ 2.0f * x * z + 2.0f * w * y, 2.0f * y * z - 2.0f * w * x, 1.0f - 2.0f * x2 - 2.0f * y2, 0.0f },
+                  Vec4f{ 0.0f, 0.0f, 0.0f, 1.0f } };
+}
+
+Mat4f LookAt(const Vec3f& position, const Vec3f& target, const Vec3f& up)
+{
+    Vec3f t       = -position;
+    Vec3f forward = Normalize(target - position);
+    Vec3f right   = Cross(forward, Normalize(up));
+    Vec3f newUp   = Cross(right, forward);
+    Mat4f result  = Mat4f::Identity();
+    result[ 0 ]   = Vec4f{ right, 0.0f };
+    result[ 1 ]   = Vec4f{ newUp, 0.0f };
+    result[ 2 ]   = Vec4f{ -forward, 0.0f };
+    result.Transpose();
+    result[ 3 ] = Vec4f{ t, 1.0f };
+    return result;
+}
+
+/* Creates a right-handed, y-up, perspective projection matrix. */
+Mat4f PerspectiveProjection(const float& fovy, const float& aspect, const float& near, const float& far)
+{
+    float d = 1.0f / tanf(fovy * 0.5f);
+    float s = far - near;
+    return Mat4f(d / aspect,
+                 0.0f,
+                 0.0f,
+                 0.0f,
+                 0.0f,
+                 d,
+                 0.0f,
+                 0.0f,
+                 0.0f,
+                 0.0f,
+                 -(near + far) / s,
+                 -1.0f,
+                 0.0f,
+                 0.0f,
+                 -(2.0f * near * far) / s,
+                 0.0f);
+}
+
+Mat4f Translate(const Vec3f& v)
+{
+    Mat4f result = Mat4f::Identity();
+    result[ 3 ]  = Vec4f{ v, 1.0f };
+
+    return result;
+}
+
+Mat4f Scale(const Vec3f& v)
+{
+    Mat4f result = Mat4f::Identity();
+    result[ 0 ][ 0 ] *= v.x;
+    result[ 1 ][ 1 ] *= v.y;
+    result[ 2 ][ 2 ] *= v.z;
+
+    return result;
+}
+
+void Translate(Mat4f& m, const Vec3f& v)
+{
+    m[ 3 ][ 0 ] += v.x;
+    m[ 3 ][ 1 ] += v.y;
+    m[ 3 ][ 2 ] += v.z;
+}
+
+void Scale(Mat4f& m, const Vec3f& v)
+{
+    m[ 0 ][ 0 ] *= v.x;
+    m[ 1 ][ 1 ] *= v.y;
+    m[ 2 ][ 2 ] *= v.z;
+}
