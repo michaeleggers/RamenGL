@@ -17,9 +17,10 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
+#define RAMEN_QUAT_EPSILON (0.0000001)
 #define RAMEN_PI (3.14159265358979323846264338327950288)
 #define TO_RAD(angle) (RAMEN_PI * angle / 180.0f)
-#define TO_GRD(angle) (180.0f * angle / RAMEN_PI)
+#define TO_DGR(angle) (180.0f * angle / RAMEN_PI)
 
 static SDL_Window*   g_pWindow;
 static SDL_Renderer* g_pRenderer;
@@ -503,20 +504,46 @@ struct Quat
     float x, y, z, w;
 };
 
-/* Builds a versor from given axis and rotation angle, given in degrees. */
-Quat AngleAxis(const float& x, const float& y, const float& z, const float& angle_dgr)
+/* Builds a versor from given axis and rotation angle, given in degrees.
+ * A versor is the expression of a rotation in a '4D rotational vector'.
+ * Note that this computes a unit-quaternion.
+ * Also note that mathematicians don't like it when we call Quaternions Vectors!
+ */
+Quat AngleAxis(const float& x, const float& y, const float& z, const float& angleDgr)
 {
     Quat result{};
 
-    const float& angle_rad      = TO_RAD(angle_dgr);
-    const float& half_theta     = angle_rad * 0.5f;
-    const float& sin_half_theta = sinf(half_theta);
-    result.x                    = sin_half_theta * x;
-    result.y                    = sin_half_theta * y;
-    result.z                    = sin_half_theta * z;
-    result.w                    = cosf(half_theta);
+    const float& angleRad     = TO_RAD(angleDgr);
+    const float& halfTheta    = angleRad * 0.5f;
+    const float& sinHalfTheta = sinf(halfTheta);
+    result.x                  = sinHalfTheta * x;
+    result.y                  = sinHalfTheta * y;
+    result.z                  = sinHalfTheta * z;
+    result.w                  = cosf(halfTheta);
 
     return result;
+}
+
+Mat4f AsMatrix(const Quat& q)
+{
+    const float& x  = q.x;
+    const float& y  = q.y;
+    const float& z  = q.z;
+    const float& w  = q.w;
+    const float  x2 = x * x;
+    const float  y2 = y * y;
+    const float  z2 = z * z;
+    const float  w2 = w * w;
+
+    if ( x2 + y2 + z2 + w2 < RAMEN_QUAT_EPSILON )
+    {
+        // TODO: Normalize first.
+    }
+
+    return Mat4f{ Vec4f{ 1.0f - 2.0f * y2 - 2.0f * z2, 2.0f * x * y + 2.0f * w * z, 2.0f * x * z - 2.0f * w * y, 0.0f },
+                  Vec4f{ 2.0f * x * y - 2.0f * w * z, 1.0f - 2.0f * x2 - 2.0f * z2, 2.0f * y * z + 2.0f * w * x, 0.0f },
+                  Vec4f{ 2.0f * x * z + 2.0f * w * y, 2.0f * y * z - 2.0f * w * x, 1.0f - 2.0f * x2 - 2.0f * y2, 0.0f },
+                  Vec4f{ 0.0f, 0.0f, 0.0f, 1.0f } };
 }
 
 struct Vertex
