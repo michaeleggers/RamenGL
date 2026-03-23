@@ -21,75 +21,6 @@
 #include "ramen/rgl_model.h"
 #include "ramen/rgl_shader.h"
 
-static std::vector<Vertex> g_Cone;
-static std::vector<Vertex> g_Cap;
-static GLuint              g_ConeVBO;
-static GLuint              g_CapVBO;
-
-void CreateGeometry()
-{
-    // Triangle Fan mit 18 Vertices anlegen
-    // Die Spitze des Konus ist ein Vertex, den alle Triangles gemeinsam haben;
-    // um einen Konus anstatt einen Kreis zu produzieren muss der Vertex einen positiven z-Wert haben
-    g_Cone.push_back(Vertex{ .position = Vec3f{ 0.0f, 0.0f, 75.0f }, .normal = Vec3f{}, .color = Vec3f{ 0, 1, 0 } });
-    // Kreise um den Mittelpunkt und spezifiziere Vertices entlang des Kreises
-    // um einen Triangle_Fan zu erzeugen
-    int iPivot = 1;
-    for ( float angle = 0.0f; angle < (2.0f * RAMEN_PI); angle += (RAMEN_PI / 8.0f) )
-    {
-        // Berechne x und y Positionen des naechsten Vertex
-        float x = 50.0f * sinf(angle);
-        float y = 50.0f * cosf(angle);
-
-        Vertex v{};
-
-        // Alterniere die Farbe
-        if ( (iPivot % 2) == 0 )
-            v.color = Vec3f{ 0.235f, 0.235f, 0.235f };
-        else
-            v.color = Vec3f{ 0.0f, 0.6f, 1.0f };
-
-        // Inkrementiere iPivot um die Farbe beim naechsten mal zu wechseln
-        iPivot++;
-
-        // Spezifiziere den naechsten Vertex des Triangle_Fans
-        v.position = Vec3f{ x, y, 0.0f };
-        g_Cone.push_back(v);
-    }
-
-    // Fertig mit dem Konus
-    /*
-    // Erzeuge einen weiteren Triangle_Fan um den Boden zu bedecken
-    boden.Begin(GL_TRIANGLE_FAN, 18);
-    // Das Zentrum des Triangle_Fans ist im Ursprung
-    boden.Vertex3f(0.0f, 0.0f, 0.0f);
-    for ( float angle = 0.0f; angle < (2.0f * GL_PI); angle += (GL_PI / 8.0f) )
-    {
-        // Berechne x und y Positionen des naechsten Vertex
-        float x = 50.0f * sin(angle);
-        float y = 50.0f * cos(angle);
-
-        // Alterniere die Farbe
-        if ( (iPivot % 2) == 0 )
-            boden.Color4f(1, 0.8, 0.2, 1);
-        else
-            boden.Color4f(0, 0.8, 0, 1);
-
-        // Inkrementiere iPivot um die Farbe beim naechsten mal zu wechseln
-        iPivot++;
-
-        // Spezifiziere den naechsten Vertex des Triangle_Fans
-        boden.Vertex3f(x, y, 0);
-    }
-
-    // Fertig mit dem Bodens
-    boden.End();
-    */
-
-    glCreateBuffers(1, &g_ConeVBO);
-    glNamedBufferData(g_ConeVBO, g_Cone.size() * sizeof(Vertex), g_Cone.data(), GL_STATIC_DRAW);
-}
-
 int main(int argc, char** argv)
 {
     Ramen* pRamen = Ramen::Create();
@@ -109,16 +40,11 @@ int main(int argc, char** argv)
         fprintf(stderr, "Could not load model file.\n");
     }
 
-    /* Create Cylinder and upload to GPU */
-    CreateGeometry();
-
     /* Create camera */
-    Camera camera(Vec3f{ 0.0f, 0.0f, 30.0f }, Vec3f{ 0.0f, 0.0f, 0.0f });
-    camera.RotateAroundUp(-20.0f);
+    Camera camera(Vec3f{ 0.0f, 0.0f, 20.0f }, Vec3f{ 0.0f, 0.0f, 0.0f });
 
     /* Model mat*/
-    Mat4f modelMat = Scale(Vec3f{ 3.0f, 3.0f, 3.0f });
-    Translate(modelMat, Vec3f{ 0.0f, 0.0f, -20.0f }); //Mat4f::Identity();
+    Mat4f modelMat = Mat4f::Identity();
 
     /* VAO. */
     GLuint VAO;
