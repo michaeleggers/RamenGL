@@ -6,15 +6,13 @@
 class Camera
 {
   public:
-    Camera(const Vec3f& position, const Vec3f& target)
+    Camera(const Vec3f& position)
     {
-        Vec3f forward  = Normalize(target - position);
         m_Position     = position;
-        m_Forward      = forward;
-        Vec3f up       = Vec3f{ 0.0f, 1.0f, 0.0f };
-        Vec3f right    = Normalize(Cross(m_Forward, up));
-        m_Up           = Normalize(Cross(right, m_Forward));
-        m_qOrientation = AngleAxis(m_Forward, 0.0f);
+        m_Forward      = Vec3f{ 0.0f, 0.0f, -1.0f };
+        m_Up           = Vec3f{ 0.0f, 1.0f, 0.0f };
+        m_Right        = Vec3f{ 1.0f, 0.0f, 0.0f };
+        m_qOrientation = AngleAxis(m_Up, 0.0f);
     }
 
     const Vec3f& GetPosition() const
@@ -49,9 +47,9 @@ class Camera
     // TODO: Create 3x3 rotation matrix to avoid conversions.
     void RotateAroundUp(const float& angle)
     {
-        Quat qRot      = AngleAxis(Normalize(m_Up), angle);
+        Quat qRot      = AngleAxis(m_Up, angle);
         m_qOrientation = qRot * m_qOrientation;
-        Mat4f rotMat   = AsMat4f(m_qOrientation);
+        Mat4f rotMat   = AsMat4f(qRot);
         m_Forward      = Vec3f{ rotMat * Vec4f{ 0.0f, 0.0f, -1.0f, 0.0f } };
     }
 
@@ -60,7 +58,7 @@ class Camera
     {
         Quat qRot      = AngleAxis(GetRight(), angle);
         m_qOrientation = qRot * m_qOrientation;
-        Mat4f rotMat   = AsMat4f(m_qOrientation);
+        Mat4f rotMat   = AsMat4f(qRot);
         m_Forward      = Vec3f{ rotMat * Vec4f{ 0.0f, 0.0f, -1.0f, 0.0f } };
         m_Up           = Vec3f{ rotMat * Vec4f{ 0.0f, 1.0f, 0.0f, 0.0f } };
     }
@@ -69,6 +67,7 @@ class Camera
     Vec3f m_Position;
     Vec3f m_Forward;
     Vec3f m_Up;
+    Vec3f m_Right;
     Quat  m_qOrientation;
 };
 
