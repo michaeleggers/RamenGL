@@ -48,7 +48,7 @@ class Camera
     void RotateAroundUp(const float& angle)
     {
         Quat qRot      = AngleAxis(m_Up, angle);
-        m_qOrientation = qRot * m_qOrientation;
+        m_qOrientation = qRot;
         Mat4f rotMat   = AsMat4f(qRot);
         m_Forward      = Vec3f{ rotMat * Vec4f{ 0.0f, 0.0f, -1.0f, 0.0f } };
     }
@@ -57,7 +57,7 @@ class Camera
     void RotateAroundSide(const float& angle)
     {
         Quat qRot      = AngleAxis(GetRight(), angle);
-        m_qOrientation = qRot * m_qOrientation;
+        m_qOrientation = qRot;
         Mat4f rotMat   = AsMat4f(qRot);
         m_Forward      = Vec3f{ rotMat * Vec4f{ 0.0f, 0.0f, -1.0f, 0.0f } };
         m_Up           = Vec3f{ rotMat * Vec4f{ 0.0f, 1.0f, 0.0f, 0.0f } };
