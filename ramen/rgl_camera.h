@@ -38,23 +38,22 @@ class Camera
     }
 
     /* Orient camera so that it looks at target. */
-    void Orient(const Vec3f target)
-    {
-        Vec3f newForward = Normalize(target - m_Position);
-        Vec3f newSide    = Normalize(Cross(newForward, Vec3f{ 0.0f, 1.0f, 0.0f }));
-        Vec3f newUp      = Normalize(Cross(newSide, newForward));
-        m_qOrientation   = AngleAxis(newForward, 0.0f);
-    }
+    // void Orient(const Vec3f target)
+    // {
+    //     Vec3f newForward = Normalize(target - m_Position);
+    //     Vec3f newSide    = Normalize(Cross(newForward, Vec3f{ 0.0f, 1.0f, 0.0f }));
+    //     Vec3f newUp      = Normalize(Cross(newSide, newForward));
+    //     m_qOrientation   = AngleAxis(newForward, 0.0f);
+    // }
 
     void RotateAroundUp(const float& angle)
     {
         Quat qRot      = AngleAxis(Normalize(m_Up), angle);
-        m_qOrientation = qRot * m_qOrientation;
-        Mat4f rotMat   = AsMat4f(qRot);
+        m_qOrientation = m_qOrientation * qRot;
+        Mat4f rotMat   = AsMat4f(m_qOrientation);
         m_Forward
             = Vec3f{ rotMat
                      * Vec4f{ 0.0f, 0.0f, -1.0f, 0.0f } }; // TODO: Create 3x3 rotation matrix to avoid conversions.
-        m_Up = Vec3f{ rotMat * Vec4f{ 0.0f, 1.0f, 0.0f, 0.0f } };
     }
 
   private:

@@ -145,17 +145,23 @@ Mat4f AsMat4f(const Quat& qIn)
 
 Mat4f LookAt(const Vec3f& position, const Vec3f& target, const Vec3f& up)
 {
-    Vec3f t       = -position;
-    Vec3f forward = Normalize(target - position);
-    Vec3f right   = Cross(forward, Normalize(up));
-    Vec3f newUp   = Cross(right, forward);
-    Mat4f result  = Mat4f::Identity();
-    result[ 0 ]   = Vec4f{ right, 0.0f };
-    result[ 1 ]   = Vec4f{ newUp, 0.0f };
-    result[ 2 ]   = Vec4f{ -forward, 0.0f };
-    result.Transpose();
-    result[ 3 ] = Vec4f{ t, 1.0f };
-    return result;
+    Vec3f t = -position;
+    Vec3f f = Normalize(target - position);
+    Vec3f r = Cross(f, Normalize(up));
+    Vec3f u = Cross(r, f);
+    Mat4f R = Mat4f::Identity();
+    R(0, 0) = r.x;
+    R(0, 1) = r.y;
+    R(0, 2) = r.z;
+    R(1, 0) = u.x;
+    R(1, 1) = u.y;
+    R(1, 2) = u.z;
+    R(2, 0) = f.x;
+    R(2, 1) = f.y;
+    R(2, 2) = f.z;
+    Mat4f T = Translate(t);
+
+    return R * T;
 }
 
 /* Creates a right-handed, y-up, perspective projection matrix. */
