@@ -47,48 +47,48 @@ class Camera
     // TODO: Create 3x3 rotation matrix to avoid conversions.
     void RotateAroundWorldUp(const float& angle)
     {
-        Quat  qRot     = AngleAxis(RAMEN_WORLD_UP, angle);
-        Mat4f rotMat   = ToMat4f(qRot);
-        m_Forward      = Vec3f{ rotMat * Vec4f{ m_Forward, 0.0f } };
-        m_Up           = Vec3f{ rotMat * Vec4f{ m_Up, 0.0f } };
-        m_Right        = Vec3f{ rotMat * Vec4f{ m_Right, 0.0f } };
-        m_qOrientation = m_qOrientation * qRot;
+        Quat q         = AngleAxis(RAMEN_WORLD_UP, angle);
+        m_qOrientation = q * m_qOrientation;
+        Mat4f R        = ToMat4f(m_qOrientation);
+        m_Forward      = Vec3f{ R * Vec4f{ RAMEN_WORLD_FORWARD, 0.0f } };
+        m_Up           = Vec3f{ R * Vec4f{ RAMEN_WORLD_UP, 0.0f } };
+        m_Right        = Vec3f{ R * Vec4f{ RAMEN_WORLD_RIGHT, 0.0f } };
     }
 
     // TODO: Create 3x3 rotation matrix to avoid conversions.
     void RotateAroundUp(const float& angle)
     {
-        Quat  qRot     = AngleAxis(m_Up, angle);
-        Mat4f rotMat   = ToMat4f(qRot);
-        m_Forward      = Vec3f{ rotMat * Vec4f{ m_Forward, 0.0f } };
-        m_Right        = Vec3f{ rotMat * Vec4f{ m_Right, 0.0f } };
-        m_qOrientation = m_qOrientation * qRot;
+        Quat q         = AngleAxis(m_Up, angle);
+        m_qOrientation = q * m_qOrientation;
+        Mat4f R        = ToMat4f(m_qOrientation);
+        m_Forward      = Vec3f{ R * Vec4f{ RAMEN_WORLD_FORWARD, 0.0f } };
+        m_Right        = Vec3f{ R * Vec4f{ RAMEN_WORLD_RIGHT, 0.0f } };
     }
 
     // TODO: Create 3x3 rotation matrix to avoid conversions.
     void RotateAroundSide(const float& angle)
     {
-        Quat  qRot     = AngleAxis(GetRight(), angle);
-        Mat4f rotMat   = ToMat4f(qRot);
-        m_Forward      = Vec3f{ rotMat * Vec4f{ m_Forward, 0.0f } };
-        m_Up           = Vec3f{ rotMat * Vec4f{ m_Up, 0.0f } };
-        m_qOrientation = m_qOrientation * qRot;
+        Quat q         = AngleAxis(GetRight(), angle);
+        m_qOrientation = q * m_qOrientation;
+        Mat4f R        = ToMat4f(m_qOrientation);
+        m_Forward      = Vec3f{ R * Vec4f{ RAMEN_WORLD_FORWARD, 0.0f } };
+        m_Up           = Vec3f{ R * Vec4f{ RAMEN_WORLD_UP, 0.0f } };
     }
     void RotateAroundSide(const Quat& q)
     {
-        Mat4f rotMat   = ToMat4f(q);
-        m_Forward      = Vec3f{ rotMat * Vec4f{ m_Forward, 0.0f } };
-        m_Up           = Vec3f{ rotMat * Vec4f{ m_Up, 0.0f } };
-        m_qOrientation = m_qOrientation * q;
+        m_qOrientation = q * m_qOrientation;
+        Mat4f R        = ToMat4f(m_qOrientation);
+        m_Forward      = Vec3f{ R * Vec4f{ RAMEN_WORLD_FORWARD, 0.0f } };
+        m_Up           = Vec3f{ R * Vec4f{ RAMEN_WORLD_UP, 0.0f } };
     }
 
     void RotateAroundForward(const float& angle)
     {
-        Quat  qRot     = AngleAxis(m_Forward, angle);
-        Mat4f rotMat   = ToMat4f(qRot);
-        m_Up           = Vec3f{ rotMat * Vec4f{ m_Up, 0.0f } };
-        m_Right        = Vec3f{ rotMat * Vec4f{ m_Right, 0.0f } };
-        m_qOrientation = m_qOrientation * qRot;
+        Quat q         = AngleAxis(m_Forward, angle);
+        m_qOrientation = q * m_qOrientation;
+        Mat4f R        = ToMat4f(m_qOrientation);
+        m_Up           = Vec3f{ R * Vec4f{ RAMEN_WORLD_UP, 0.0f } };
+        m_Right        = Vec3f{ R * Vec4f{ RAMEN_WORLD_RIGHT, 0.0f } };
     }
 
   private:

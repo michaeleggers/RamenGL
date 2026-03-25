@@ -121,6 +121,18 @@ class Ramen
         return m_glContext;
     }
 
+    void ProcessInputEvent(const SDL_Event e) const
+    {
+        if ( e.type == SDL_EVENT_KEY_DOWN )
+        {
+            printf("key down event.\n");
+        }
+        else if ( e.type == SDL_EVENT_KEY_UP )
+        {
+            printf("key up event.\n");
+        }
+    }
+
   private:
     SDL_Window*   m_pWindow;
     SDL_GLContext m_glContext;

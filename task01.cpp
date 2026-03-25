@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     camera.RotateAroundWorldUp(15.0f);
     camera.RotateAroundWorldUp(15.0f);
 #else
-    camera.RotateAroundWorldUp(30.0f);
+    // camera.RotateAroundWorldUp(30.0f);
 #endif
 
 #if 1
@@ -54,9 +54,8 @@ int main(int argc, char** argv)
     camera.RotateAroundSide(-20.0f);
 #endif
 
-    //camera.RotateAroundSide(35.0f);
-
-    camera.RotateAroundForward(90.0f);
+    camera.RotateAroundSide(35.0f);
+    // camera.RotateAroundForward(45.0f);
 
     /* Model mat*/
     Mat4f modelMat = Mat4f::Identity();
@@ -86,6 +85,7 @@ int main(int argc, char** argv)
         while ( SDL_PollEvent(&e) )
         {
             ImGui_ImplSDL3_ProcessEvent(&e);
+            pRamen->ProcessInputEvent(e);
 
             if ( e.type == SDL_EVENT_QUIT )
             {
@@ -108,6 +108,11 @@ int main(int argc, char** argv)
                 }
             }
         }
+
+        // camera.RotateAroundForward(1.0f);
+        // camera.RotateAroundSide(1.0f);
+        // camera.RotateAroundUp(1.0f);
+        camera.RotateAroundWorldUp(0.5f);
 
         /* Query new frame dimensions */
         int windowWidth, windowHeight;
