@@ -91,6 +91,21 @@ class Camera
         m_Right        = Vec3f{ R * Vec4f{ RAMEN_WORLD_RIGHT, 0.0f } };
     }
 
+    void Roll(const float& angle)
+    {
+        RotateAroundForward(angle);
+    }
+
+    void Pitch(const float& angle)
+    {
+        RotateAroundSide(angle);
+    }
+
+    void Yaw(const float& angle)
+    {
+        RotateAroundUp(angle);
+    }
+
   private:
     Vec3f m_Position;
     Vec3f m_Forward;
