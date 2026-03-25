@@ -379,18 +379,57 @@ struct Quat
 
     const Quat operator*(const Quat& rhs) const
     {
-        return Quat{ rhs.w * w - rhs.x * x - rhs.y * y - rhs.z * z,
-                     rhs.w * x + rhs.x * w - rhs.y * z + rhs.z * y,
-                     rhs.w * y + rhs.x * z + rhs.y * w - rhs.z * x,
-                     rhs.w * z - rhs.x * y + rhs.y * x + rhs.z * w };
+        Quat q{ rhs.w * x + rhs.x * w - rhs.y * z + rhs.z * y,
+                rhs.w * y + rhs.x * z + rhs.y * w - rhs.z * x,
+                rhs.w * z - rhs.x * y + rhs.y * x + rhs.z * w,
+                rhs.w * w - rhs.x * x - rhs.y * y - rhs.z * z };
+
+        q.Normalize();
+        return q;
     }
 
-    Quat& operator/=(const float s)
+    const float Length2()
     {
-        x /= s;
-        y /= s;
-        z /= s;
-        w /= s;
+        return x * x + y * y + z * z + w * w;
+    }
+
+    const float Length()
+    {
+        return sqrt(Length2());
+    }
+
+    void Normalize()
+    {
+        float len = Length();
+        if ( len > RAMEN_EPSILON )
+        {
+            *this = *this / len;
+        }
+    }
+
+    const Quat operator/(const float& s) const
+    {
+        Quat q{ x, y, z, w };
+        if ( s < RAMEN_EPSILON )
+        {
+            return q;
+        }
+        q.x /= s;
+        q.y /= s;
+        q.z /= s;
+        q.w /= s;
+        return q;
+    }
+
+    Quat& operator/=(const float& s)
+    {
+        if ( s > RAMEN_EPSILON )
+        {
+            x /= s;
+            y /= s;
+            z /= s;
+            w /= s;
+        }
         return *this;
     }
 };
@@ -409,15 +448,15 @@ float Dot(const Vec4f& a, const Vec4f& b);
  */
 Mat4f Inverse(const Mat4f& m);
 
-/* Builds a versor from given axis and rotation angle (in degrees), given in degrees.
+/* Builds a versor (a unit quaternion) from given axis and rotation 
+ * angle (in degrees), given in degrees.
  * A versor is the expression of a rotation in a '4D rotational vector'.
- * Note that this computes a unit-quaternion.
  * Also note that mathematicians don't like it when we call Quaternions Vectors!
  */
 Quat AngleAxis(const float& x, const float& y, const float& z, const float& angleDgr);
 Quat AngleAxis(const Vec3f& v, const float& angleDgr);
 
-Mat4f AsMat4f(const Quat& qIn);
+Mat4f ToMat4f(const Quat& qIn);
 
 Mat4f LookAt(const Vec3f& position, const Vec3f& target, const Vec3f& up);
 

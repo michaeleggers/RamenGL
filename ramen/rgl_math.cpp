@@ -1,4 +1,5 @@
 #include "rgl_math.h"
+#include "rgl_defines.h"
 
 Vec3f::Vec3f(const Vec4f& v4)
 {
@@ -36,7 +37,11 @@ float Dot(const Vec3f& a, const Vec3f& b)
 Vec4f Normalize(const Vec4f& v)
 {
     float len = Length(v);
-    return v / len;
+    if ( len > RAMEN_EPSILON )
+    {
+        return v / len;
+    }
+    return v;
 }
 
 float Dot(const Vec4f& a, const Vec4f& b)
@@ -119,13 +124,13 @@ Quat AngleAxis(const Vec3f& v, const float& angleDgr)
     return AngleAxis(v.x, v.y, v.z, angleDgr);
 }
 
-Mat4f AsMat4f(const Quat& qIn)
+Mat4f ToMat4f(const Quat& qIn)
 {
-    Quat  q    = qIn;
-    float len2 = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
-    if ( fabs(len2 - 1.0f) > RAMEN_QUAT_EPSILON )
+    Quat        q    = qIn;
+    const float len2 = q.Length2();
+    if ( fabs(len2 - 1.0f) > RAMEN_EPSILON )
     {
-        q /= sqrt(len2);
+        q.Normalize();
     }
 
     const float& x  = q.x;
@@ -137,11 +142,10 @@ Mat4f AsMat4f(const Quat& qIn)
     const float  z2 = z * z;
     const float  w2 = w * w;
 
-    Mat4f result{ Vec4f{ 1.0f - 2.0f * y2 - 2.0f * z2, 2.0f * x * y + 2.0f * w * z, 2.0f * x * z - 2.0f * w * y, 0.0f },
-                  Vec4f{ 2.0f * x * y - 2.0f * w * z, 1.0f - 2.0f * x2 - 2.0f * z2, 2.0f * y * z + 2.0f * w * x, 0.0f },
-                  Vec4f{ 2.0f * x * z + 2.0f * w * y, 2.0f * y * z - 2.0f * w * x, 1.0f - 2.0f * x2 - 2.0f * y2, 0.0f },
+    Mat4f result{ Vec4f{ 1.0f - 2.0f * y2 - 2.0f * z2, 2.0f * x * y - 2.0f * w * z, 2.0f * x * z + 2.0f * w * y, 0.0f },
+                  Vec4f{ 2.0f * x * y + 2.0f * w * z, 1.0f - 2.0f * x2 - 2.0f * z2, 2.0f * y * z - 2.0f * w * x, 0.0f },
+                  Vec4f{ 2.0f * x * z - 2.0f * w * y, 2.0f * y * z + 2.0f * w * x, 1.0f - 2.0f * x2 - 2.0f * y2, 0.0f },
                   Vec4f{ 0.0f, 0.0f, 0.0f, 1.0f } };
-    result.Transpose(); // FIXME: Don't do this! Construct the matrix correctly, instead ;)
 
     return result;
 }

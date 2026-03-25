@@ -45,22 +45,41 @@ class Camera
     // }
 
     // TODO: Create 3x3 rotation matrix to avoid conversions.
+    void RotateAroundWorldUp(const float& angle)
+    {
+        Quat  qRot     = AngleAxis(Vec3f{ 0.0f, 1.0f, 0.0f }, angle);
+        Mat4f rotMat   = ToMat4f(qRot);
+        m_Forward      = Vec3f{ rotMat * Vec4f{ m_Forward, 0.0f } };
+        m_Up           = Vec3f{ rotMat * Vec4f{ m_Up, 0.0f } };
+        m_Right        = Vec3f{ rotMat * Vec4f{ m_Right, 0.0f } };
+        m_qOrientation = m_qOrientation * qRot;
+    }
+
+    // TODO: Create 3x3 rotation matrix to avoid conversions.
     void RotateAroundUp(const float& angle)
     {
-        Quat qRot      = AngleAxis(m_Up, angle);
-        m_qOrientation = qRot;
-        Mat4f rotMat   = AsMat4f(qRot);
+        Quat  qRot     = AngleAxis(m_Up, angle);
+        Mat4f rotMat   = ToMat4f(qRot);
         m_Forward      = Vec3f{ rotMat * Vec4f{ 0.0f, 0.0f, -1.0f, 0.0f } };
+        m_Right        = Vec3f{ rotMat * Vec4f{ m_Right, 0.0f } };
+        m_qOrientation = m_qOrientation * qRot;
     }
 
     // TODO: Create 3x3 rotation matrix to avoid conversions.
     void RotateAroundSide(const float& angle)
     {
-        Quat qRot      = AngleAxis(GetRight(), angle);
-        m_qOrientation = qRot;
-        Mat4f rotMat   = AsMat4f(qRot);
-        m_Forward      = Vec3f{ rotMat * Vec4f{ 0.0f, 0.0f, -1.0f, 0.0f } };
-        m_Up           = Vec3f{ rotMat * Vec4f{ 0.0f, 1.0f, 0.0f, 0.0f } };
+        Quat  qRot     = AngleAxis(GetRight(), angle);
+        Mat4f rotMat   = ToMat4f(qRot);
+        m_Forward      = Vec3f{ rotMat * Vec4f{ m_Forward, 0.0f } };
+        m_Up           = Vec3f{ rotMat * Vec4f{ m_Up, 0.0f } };
+        m_qOrientation = m_qOrientation * qRot;
+    }
+    void RotateAroundSide(const Quat& q)
+    {
+        Mat4f rotMat   = ToMat4f(q);
+        m_Forward      = Vec3f{ rotMat * Vec4f{ m_Forward, 0.0f } };
+        m_Up           = Vec3f{ rotMat * Vec4f{ m_Up, 0.0f } };
+        m_qOrientation = m_qOrientation * q;
     }
 
   private:
