@@ -471,4 +471,8 @@ void Translate(Mat4f& m, const Vec3f& v);
 
 void Scale(Mat4f& m, const Vec3f& v);
 
+#define RAMEN_WORLD_RIGHT Vec3f{ 1.0f, 0.0f, 0.0f }
+#define RAMEN_WORLD_UP Vec3f{ 0.0f, 1.0f, 0.0f }
+#define RAMEN_WORLD_FORWARD Vec3f{ 0.0f, 0.0f, -1.0f }
+
 #endif

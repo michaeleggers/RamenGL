@@ -42,9 +42,21 @@ int main(int argc, char** argv)
 
     /* Create camera */
     Camera camera(Vec3f{ 0.0f, 1.0f, 10.0f });
+#if 0
+    camera.RotateAroundWorldUp(15.0f);
+    camera.RotateAroundWorldUp(15.0f);
+#else
     camera.RotateAroundWorldUp(30.0f);
+#endif
+
+#if 1
     camera.RotateAroundSide(20.0f);
-    camera.RotateAroundSide(20.0f);
+    camera.RotateAroundSide(-20.0f);
+#endif
+
+    //camera.RotateAroundSide(35.0f);
+
+    camera.RotateAroundForward(90.0f);
 
     /* Model mat*/
     Mat4f modelMat = Mat4f::Identity();
@@ -68,7 +80,6 @@ int main(int argc, char** argv)
     /* Main loop */
     bool isRunning = true;
     SDL_GL_SetSwapInterval(1); /* 1 = VSync enabled; 0 = VSync disabled */
-    glPointSize(20.0f);        // TODO: Delete later.
     while ( isRunning )
     {
         SDL_Event e;
