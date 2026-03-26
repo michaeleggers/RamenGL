@@ -154,8 +154,8 @@ Mat4f LookAt(const Vec3f& position, const Vec3f& target, const Vec3f& up)
 {
     Vec3f t = -position;
     Vec3f f = Normalize(target - position);
-    Vec3f r = Normalize(Cross(f, Normalize(up)));
-    Vec3f u = Cross(r, f);
+    Vec3f r = Normalize(Cross(up, Normalize(f)));
+    Vec3f u = Cross(f, r);
     Mat4f R = Mat4f::Identity();
     R(0, 0) = r.x;
     R(1, 0) = r.y;
@@ -202,6 +202,12 @@ Mat4f Translate(const Vec3f& v)
     return result;
 }
 
+void Translate(Mat4f& M, const Vec3f& v)
+{
+    const Mat4f T = Translate(v);
+    M             = T * M;
+}
+
 Mat4f Scale(const Vec3f& v)
 {
     Mat4f result = Mat4f::Identity();
@@ -212,16 +218,26 @@ Mat4f Scale(const Vec3f& v)
     return result;
 }
 
-void Translate(Mat4f& m, const Vec3f& v)
+void Scale(Mat4f& M, const Vec3f& v)
 {
-    m[ 3 ][ 0 ] += v.x;
-    m[ 3 ][ 1 ] += v.y;
-    m[ 3 ][ 2 ] += v.z;
+    const Mat4f S = Scale(v);
+    M             = S * M;
 }
 
-void Scale(Mat4f& m, const Vec3f& v)
+Mat4f Rotate(const Vec3f& axis, const float& angleDgr)
 {
-    m[ 0 ][ 0 ] *= v.x;
-    m[ 1 ][ 1 ] *= v.y;
-    m[ 2 ][ 2 ] *= v.z;
+    const Quat q = AngleAxis(axis, angleDgr);
+    return ToMat4f(q);
+}
+
+void Rotate(Mat4f& M, const Vec3f& axis, const float& angleDgr)
+{
+    const Mat4f R = Rotate(axis, angleDgr);
+    M             = R * M;
+}
+
+Vec3f Rotate(const Quat& q, const Vec3f& v)
+{
+    // TODO: Implement
+    return Vec3f{};
 }

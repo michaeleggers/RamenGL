@@ -41,24 +41,28 @@ int main(int argc, char** argv)
     }
 
     /* Create camera */
-    Camera camera(Vec3f{ 0.0f, 1.0f, 10.0f });
+    Camera camera(Vec3f{ 0.0f, 1.0f, 30.0f });
+    //camera.RotateAroundWorldUp(30.0f);
 #if 0
-    camera.RotateAroundWorldUp(15.0f);
-    camera.RotateAroundWorldUp(15.0f);
+    camera.RotateAroundWorldUp(5.0f);
+    camera.RotateAroundWorldUp(0.0f);
 #else
     // camera.RotateAroundWorldUp(30.0f);
 #endif
 
-#if 1
+#if 0
     camera.RotateAroundSide(20.0f);
     camera.RotateAroundSide(-20.0f);
 #endif
-
-    camera.RotateAroundSide(35.0f);
-    // camera.RotateAroundForward(45.0f);
+    // camera.RotateAroundUp(-30.0f);
+    // camera.RotateAroundSide(35.0f);
+    camera.RotateAroundForward(45.0f);
 
     /* Model mat*/
     Mat4f modelMat = Mat4f::Identity();
+    // Rotate(modelMat, Vec3f{ 0.0f, 0.0f, 1.0f }, 45.0f);
+    // Translate(modelMat, Vec3f{ 20.0f, 0.0f, 0.0f });
+    // Scale(modelMat, Vec3f{ 5.0f, 5.0f, 5.0f });
 
     /* VAO. */
     GLuint VAO;
@@ -112,7 +116,7 @@ int main(int argc, char** argv)
         // camera.RotateAroundForward(1.0f);
         // camera.RotateAroundSide(1.0f);
         // camera.RotateAroundUp(1.0f);
-        camera.RotateAroundWorldUp(0.5f);
+        // camera.RotateAroundWorldUp(0.5f);
 
         /* Query new frame dimensions */
         int windowWidth, windowHeight;

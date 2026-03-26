@@ -299,7 +299,7 @@ struct Mat4f
         *this = result;
     }
 
-    Mat4f operator*(const Mat4f& rhs)
+    const Mat4f operator*(const Mat4f& rhs) const
     {
         Mat4f result{};
         for ( int row = 0; row < 4; row++ )
@@ -464,6 +464,9 @@ Mat4f LookAt(const Vec3f& position, const Vec3f& target, const Vec3f& up);
 Mat4f PerspectiveProjection(const float& fovy, const float& aspect, const float& near, const float& far);
 
 Mat4f Translate(const Vec3f& v);
+Mat4f Rotate(const Vec3f& axis, const float& angleDgr);
+void  Rotate(Mat4f& M, const Vec3f& axis, const float& angleDgr);
+Vec3f Rotate(const Quat& q, const Vec3f& v);
 
 Mat4f Scale(const Vec3f& v);
 
@@ -473,6 +476,7 @@ void Scale(Mat4f& m, const Vec3f& v);
 
 #define RAMEN_WORLD_RIGHT Vec3f{ 1.0f, 0.0f, 0.0f }
 #define RAMEN_WORLD_UP Vec3f{ 0.0f, 1.0f, 0.0f }
-#define RAMEN_WORLD_FORWARD Vec3f{ 0.0f, 0.0f, -1.0f }
+#define RAMEN_WORLD_FORWARD Vec3f{ 0.0f, 0.0f, 1.0f }
+#define RAMEN_CAMERA_FORWARD Vec3f{ 0.0f, 0.0f, -1.0f }
 
 #endif
