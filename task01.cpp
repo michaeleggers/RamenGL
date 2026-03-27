@@ -41,8 +41,8 @@ int main(int argc, char** argv)
     }
 
     /* Create camera */
-    Camera camera(Vec3f{ 0.0f, 1.0f, 30.0f });
-    camera.RotateAroundWorldUp(20.0f);
+    Camera camera(Vec3f{ -5.0f, 10.0f, 30.0f });
+    // camera.RotateAroundWorldUp(20.0f);
 #if 0
     camera.RotateAroundWorldUp(5.0f);
     camera.RotateAroundWorldUp(0.0f);
@@ -55,8 +55,8 @@ int main(int argc, char** argv)
     camera.RotateAroundSide(-20.0f);
 #endif
     // camera.RotateAroundUp(-30.0f);
-    camera.RotateAroundSide(20.0f);
-    camera.RotateAroundForward(20.0f);
+    // camera.RotateAroundSide(20.0f);
+    // camera.RotateAroundForward(20.0f);
 
     /* Model mat*/
     Mat4f modelMat = Mat4f::Identity();

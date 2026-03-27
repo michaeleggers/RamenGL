@@ -154,8 +154,8 @@ Mat4f LookAt(const Vec3f& position, const Vec3f& target, const Vec3f& up)
 {
     Vec3f t = -position;
     Vec3f f = Normalize(target - position);
-    Vec3f r = Normalize(Cross(up, Normalize(f)));
-    Vec3f u = Cross(f, r);
+    Vec3f r = Normalize(Cross(f, up));
+    Vec3f u = Cross(r, f);
     Mat4f R = Mat4f::Identity();
     R(0, 0) = r.x;
     R(1, 0) = r.y;
