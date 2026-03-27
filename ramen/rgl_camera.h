@@ -12,7 +12,7 @@ class Camera
         m_Forward      = RAMEN_CAMERA_FORWARD;
         m_Up           = RAMEN_WORLD_UP;
         m_Right        = RAMEN_WORLD_RIGHT;
-        m_qOrientation = AngleAxis(m_Up, 0.0f);
+        m_qOrientation = AngleAxis(m_Forward, 0.0f);
     }
 
     const Vec3f& GetPosition() const
@@ -44,9 +44,15 @@ class Camera
     //     m_qOrientation   = AngleAxis(newForward, 0.0f);
     // }
 
+    /* NOTE: Angle is negated as the camera's forward is facing
+     * to -z and reverses the expected rotation direction (CCW)
+     * in worldspace. So, in order to transform the camera
+     * like other objects in the world (via a model matrix)
+     * this adjustment is being made to the angle.
+     */
     void RotateAroundWorldUp(const float& angle)
     {
-        Quat q         = AngleAxis(RAMEN_WORLD_UP, angle);
+        Quat q         = AngleAxis(RAMEN_WORLD_UP, -angle);
         m_qOrientation = q * m_qOrientation;
         m_qOrientation.Normalize();
         m_Forward = Rotate(m_qOrientation, RAMEN_CAMERA_FORWARD);
@@ -56,7 +62,7 @@ class Camera
 
     void RotateAroundUp(const float& angle)
     {
-        Quat q         = AngleAxis(m_Up, angle);
+        Quat q         = AngleAxis(m_Up, -angle);
         m_qOrientation = q * m_qOrientation;
         m_qOrientation.Normalize();
         m_Forward = Rotate(m_qOrientation, RAMEN_CAMERA_FORWARD);
@@ -65,7 +71,7 @@ class Camera
 
     void RotateAroundSide(const float& angle)
     {
-        Quat q         = AngleAxis(GetRight(), angle);
+        Quat q         = AngleAxis(GetRight(), -angle);
         m_qOrientation = q * m_qOrientation;
         m_qOrientation.Normalize();
         m_Forward = Rotate(m_qOrientation, RAMEN_CAMERA_FORWARD);

@@ -70,8 +70,9 @@ int main(int argc, char** argv)
     camera.RotateAroundSide(-20.0f);
 #endif
     // camera.RotateAroundUp(-30.0f);
-    // camera.RotateAroundSide(20.0f);
-    // camera.RotateAroundForward(20.0f);
+    // camera.RotateAroundSide(15.0f);
+    // camera.RotateAroundSide(-15.0f);
+    camera.RotateAroundForward(45.0f);
 
     /* Model mat*/
     Mat4f modelMat = Mat4f::Identity();
@@ -151,9 +152,9 @@ int main(int argc, char** argv)
         Mat4f viewMat = LookAt(
             camera.GetPosition(), camera.GetPosition() + camera.GetForward(), camera.GetUp()); // Mat4f::Identity();
 
-        Rotate(modelMat, RAMEN_WORLD_FORWARD, 1.0f);
-        Rotate(modelMat, RAMEN_WORLD_UP, 2.0f);
-        Rotate(modelMat, RAMEN_WORLD_RIGHT, 3.0f);
+        // Rotate(modelMat, RAMEN_WORLD_FORWARD, 1.0f);
+        // Rotate(modelMat, RAMEN_WORLD_UP, 2.0f);
+        // Rotate(modelMat, RAMEN_WORLD_RIGHT, 3.0f);
         // Vec3f rotVector{ 1.0f, 1.0f, 1.0f };
         // rotVector = Normalize(rotVector);
         // Rotate(modelMat, rotVector, 1.0f);
