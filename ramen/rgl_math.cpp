@@ -142,13 +142,10 @@ Mat4f ToMat4f(const Quat& qIn)
     const float  z2 = z * z;
     const float  w2 = w * w;
 
-    Mat4f result{ Vec4f{ 1.0f - 2.0f * y2 - 2.0f * z2, 2.0f * x * y - 2.0f * w * z, 2.0f * x * z + 2.0f * w * y, 0.0f },
-                  Vec4f{ 2.0f * x * y + 2.0f * w * z, 1.0f - 2.0f * x2 - 2.0f * z2, 2.0f * y * z - 2.0f * w * x, 0.0f },
-                  Vec4f{ 2.0f * x * z - 2.0f * w * y, 2.0f * y * z + 2.0f * w * x, 1.0f - 2.0f * x2 - 2.0f * y2, 0.0f },
+    Mat4f result{ Vec4f{ 1.0f - 2.0f * y2 - 2.0f * z2, 2.0f * x * y + 2.0f * w * z, 2.0f * x * z - 2.0f * w * y, 0.0f },
+                  Vec4f{ 2.0f * x * y - 2.0f * w * z, 1.0f - 2.0f * x2 - 2.0f * z2, 2.0f * y * z - 2.0f * w * x, 0.0f },
+                  Vec4f{ 2.0f * x * z + 2.0f * w * y, 2.0f * y * z - 2.0f * w * x, 1.0f - 2.0f * x2 - 2.0f * y2, 0.0f },
                   Vec4f{ 0.0f, 0.0f, 0.0f, 1.0f } };
-
-    /* FIXME: This shouldn't be necessary but fixed the rotation direction (z->x when rotating around y). */
-    result.Transpose();
 
     return result;
 }
