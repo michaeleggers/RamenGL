@@ -147,6 +147,9 @@ Mat4f ToMat4f(const Quat& qIn)
                   Vec4f{ 2.0f * x * z - 2.0f * w * y, 2.0f * y * z + 2.0f * w * x, 1.0f - 2.0f * x2 - 2.0f * y2, 0.0f },
                   Vec4f{ 0.0f, 0.0f, 0.0f, 1.0f } };
 
+    /* FIXME: This shouldn't be necessary but fixed the rotation direction (z->x when rotating around y). */
+    result.Transpose();
+
     return result;
 }
 
@@ -163,9 +166,14 @@ Mat4f LookAt(const Vec3f& position, const Vec3f& target, const Vec3f& up)
     R(0, 1) = u.x;
     R(1, 1) = u.y;
     R(2, 1) = u.z;
+    /* Note the flipped values of the forward vector.
+     * This does *NOT* mean, though, that this matrix
+     * is becoming left-handed.
+     */
     R(0, 2) = -f.x;
     R(1, 2) = -f.y;
     R(2, 2) = -f.z;
+
     Mat4f T = Translate(t);
 
     return R * T;

@@ -89,6 +89,13 @@ struct Vec3f
 
         return *this;
     }
+
+    const char* ToString() const
+    {
+        static char buffer[ 128 ];
+        sprintf(buffer, "[ %.2f, %.2f, %.2f ]", x, y, z);
+        return buffer;
+    }
 };
 
 struct Vec4f
@@ -184,7 +191,7 @@ struct Vec4f
     const char* ToString() const
     {
         static char buffer[ 128 ];
-        sprintf(buffer, "[ %.2f, %.2f, %.2f, %.2f ]\n", x, y, z, w);
+        sprintf(buffer, "[ %.2f, %.2f, %.2f, %.2f ]", x, y, z, w);
         return buffer;
     }
 };
@@ -352,7 +359,7 @@ struct Mat4f
     {
         static char buffer[ 256 ];
         sprintf(buffer,
-                "%.2f, %.2f, %.2f, %.2f\n%.2f, %.2f, %.2f, %.2f\n%.2f, %.2f, %.2f, %.2f\n%.2f, %.2f, %.2f, %.2f\n",
+                "%.2f, %.2f, %.2f, %.2f\n%.2f, %.2f, %.2f, %.2f\n%.2f, %.2f, %.2f, %.2f\n%.2f, %.2f, %.2f, %.2f",
                 e[ 0 ][ 0 ],
                 e[ 1 ][ 0 ],
                 e[ 2 ][ 0 ],

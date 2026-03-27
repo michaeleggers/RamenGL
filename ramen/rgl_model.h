@@ -50,6 +50,7 @@ class Model
                 for ( int k = 0; k < 3; k++ )
                 {
                     v.position[ k ] = attrib.vertices[ 3 * idx.vertex_index + k ];
+                    v.normal[ k ]   = attrib.normals[ 3 * idx.normal_index + k ];
                 }
                 m_Vertices.push_back(v);
             }
