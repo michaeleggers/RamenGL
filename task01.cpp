@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     }
 
     /* Create camera */
-    Camera camera(Vec3f{ 0.0f, 5.0f, 5.0f });
+    Camera camera(Vec3f{ 0.0f, 10.0f, 30.0f });
     // camera.RotateAroundWorldUp(20.0f);
 #if 0
     camera.RotateAroundWorldUp(5.0f);
@@ -75,9 +75,10 @@ int main(int argc, char** argv)
 
     /* Model mat*/
     Mat4f modelMat = Mat4f::Identity();
-    // Rotate(modelMat, Vec3f{ 0.0f, 0.0f, 1.0f }, 30.0f);
+    // Rotate(modelMat, RAMEN_WORLD_FORWARD, 30.0f);
+    // Rotate(modelMat, RAMEN_WORLD_RIGHT, 90.0f);
     // Scale(modelMat, Vec3f{ 0.5f });
-    // Rotate(modelMat, RAMEN_WORLD_UP, 45.0f);
+    //Rotate(modelMat, RAMEN_WORLD_UP, 45.0f);
     // Translate(modelMat, Vec3f{ 0.0f, 1.0f, 0.0f });
 
     /* VAO. */
@@ -136,7 +137,7 @@ int main(int argc, char** argv)
 
         // camera.RotateAroundForward(1.0f);
         // camera.RotateAroundSide(1.0f);
-        camera.RotateAroundUp(1.0f);
+        // camera.RotateAroundUp(1.0f);
         // camera.RotateAroundWorldUp(0.5f);
 
         /* Query new frame dimensions */
@@ -150,9 +151,9 @@ int main(int argc, char** argv)
         Mat4f viewMat = LookAt(
             camera.GetPosition(), camera.GetPosition() + camera.GetForward(), camera.GetUp()); // Mat4f::Identity();
 
-        // Rotate(modelMat, RAMEN_WORLD_FORWARD, 1.0f);
-        // Rotate(modelMat, RAMEN_WORLD_UP, 1.0f);
-        // Rotate(modelMat, RAMEN_WORLD_RIGHT, 1.0f);
+        //Rotate(modelMat, RAMEN_WORLD_FORWARD, 1.0f);
+        Rotate(modelMat, RAMEN_WORLD_UP, 1.0f);
+        Rotate(modelMat, RAMEN_WORLD_RIGHT, 1.0f);
 
         /* Projection mat */
         float aspect  = (float)windowWidth / (float)windowHeight;
