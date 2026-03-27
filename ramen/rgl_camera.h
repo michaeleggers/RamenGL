@@ -12,7 +12,7 @@ class Camera
         m_Forward      = RAMEN_CAMERA_FORWARD;
         m_Up           = RAMEN_WORLD_UP;
         m_Right        = RAMEN_WORLD_RIGHT;
-        m_qOrientation = AngleAxis(RAMEN_CAMERA_FORWARD, 0.0f);
+        m_qOrientation = AngleAxis(m_Up, 0.0f);
     }
 
     const Vec3f& GetPosition() const
