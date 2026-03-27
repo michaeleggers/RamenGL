@@ -236,8 +236,14 @@ void Rotate(Mat4f& M, const Vec3f& axis, const float& angleDgr)
     M             = R * M;
 }
 
+/* Assumes q is noramlized. */
 Vec3f Rotate(const Quat& q, const Vec3f& v)
 {
-    // TODO: Implement
-    return Vec3f{};
+    /* pure quaternion from vector */
+    const Quat p = Quat{ v.x, v.y, v.z, 0.0f };
+    /* conjugate */
+    const Quat cq = Quat{ -q.x, -q.y, -q.z, q.w };
+    /* pure quaternion rotated. Its components yield rotated v */
+    const Quat pp = q * p * cq;
+    return Vec3f{ pp.x, pp.y, pp.z };
 }
