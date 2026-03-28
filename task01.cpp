@@ -23,6 +23,21 @@
 
 int main(int argc, char** argv)
 {
+    // Vec3f v{ 0.0f, 0.0f, -1.0f };
+    // Quat  q   = AngleAxis(RAMEN_WORLD_UP, 90.0f);
+    // Vec3f qXv = Rotate(q, v);
+    // printf("qXv: %s\n", qXv.ToString());
+    //
+    // Mat4f R   = ToMat4f(q);
+    // Vec3f RXv = Vec3f{ R * Vec4f{ v, 0.0f } };
+    // printf("RXv: %s\n", RXv.ToString());
+    //
+    // Camera cam{ Vec3f{ 0.0f, 0.0f, 0.0f } };
+    // printf("cam forward: %s\n", cam.GetForward().ToString());
+    // cam.RotateAroundUp(90.0f);
+    // printf("cam forward (after 90 deg rotation): %s\n", cam.GetForward().ToString());
+    // printf("cam right (after 90 deg rotation): %s\n", cam.GetRight().ToString());
+
     Ramen* pRamen = Ramen::Create();
     pRamen->Init("Task 02", 800, 600);
 
@@ -35,26 +50,50 @@ int main(int argc, char** argv)
 
     /* Create a model on GPU */
     Model model{};
-    if ( !model.Load("./models/stormtrooper.obj") )
+    if ( !model.Load("./models/stormtrooper-neg-z.obj") )
     {
         fprintf(stderr, "Could not load model file.\n");
     }
 
     /* Create camera */
-    Camera camera(Vec3f{ -3.0f, 3.0f, -20.0f }, Vec3f{ 0.0f, 0.0f, 0.0f });
-    // camera.RotateAroundUp(35.0f);
-    // camera.RotateAroundSide(0.0f);
+    Camera camera(Vec3f{ 0.0f, 10.0f, 30.0f });
+    // camera.RotateAroundWorldUp(20.0f);
+#if 0
+    camera.RotateAroundWorldUp(5.0f);
+    camera.RotateAroundWorldUp(0.0f);
+#else
+    // camera.RotateAroundWorldUp(30.0f);
+#endif
+
+#if 0
+    camera.RotateAroundSide(20.0f);
+    camera.RotateAroundSide(-20.0f);
+#endif
+    // camera.RotateAroundUp(-30.0f);
+    // camera.RotateAroundSide(15.0f);
+    // camera.RotateAroundSide(-15.0f);
+    camera.RotateAroundForward(45.0f);
 
     /* Model mat*/
     Mat4f modelMat = Mat4f::Identity();
+    // Rotate(modelMat, RAMEN_WORLD_FORWARD, 30.0f);
+    // Rotate(modelMat, RAMEN_WORLD_RIGHT, 90.0f);
+    // Scale(modelMat, Vec3f{ 0.5f });
+    //Rotate(modelMat, RAMEN_WORLD_UP, 45.0f);
+    // Translate(modelMat, Vec3f{ 0.0f, 1.0f, 0.0f });
 
     /* VAO. */
     GLuint VAO;
     glCreateVertexArrays(1, &VAO);
     glVertexArrayVertexBuffer(VAO, 0, model.GetBuffer(), 0, sizeof(Vertex));
-    glVertexArrayAttribBinding(VAO, 0, 0);
+    /* Position */
     glVertexArrayAttribFormat(VAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
     glEnableVertexArrayAttrib(VAO, 0);
+    glVertexArrayAttribBinding(VAO, 0, 0);
+    /* Normal */
+    glVertexArrayAttribFormat(VAO, 1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float));
+    glEnableVertexArrayAttrib(VAO, 1);
+    glVertexArrayAttribBinding(VAO, 1, 0);
 
     /* Some global GL states */
     glEnable(GL_DEPTH_TEST);
@@ -67,13 +106,13 @@ int main(int argc, char** argv)
     /* Main loop */
     bool isRunning = true;
     SDL_GL_SetSwapInterval(1); /* 1 = VSync enabled; 0 = VSync disabled */
-    glPointSize(20.0f);        // TODO: Delete later.
     while ( isRunning )
     {
         SDL_Event e;
         while ( SDL_PollEvent(&e) )
         {
             ImGui_ImplSDL3_ProcessEvent(&e);
+            pRamen->ProcessInputEvent(e);
 
             if ( e.type == SDL_EVENT_QUIT )
             {
@@ -97,6 +136,11 @@ int main(int argc, char** argv)
             }
         }
 
+        // camera.RotateAroundForward(1.0f);
+        // camera.RotateAroundSide(1.0f);
+        // camera.RotateAroundUp(1.0f);
+        // camera.RotateAroundWorldUp(0.5f);
+
         /* Query new frame dimensions */
         int windowWidth, windowHeight;
         SDL_GetWindowSize(pRamen->GetWindow(), &windowWidth, &windowHeight);
@@ -108,9 +152,16 @@ int main(int argc, char** argv)
         Mat4f viewMat = LookAt(
             camera.GetPosition(), camera.GetPosition() + camera.GetForward(), camera.GetUp()); // Mat4f::Identity();
 
+        // Rotate(modelMat, RAMEN_WORLD_FORWARD, 1.0f);
+        // Rotate(modelMat, RAMEN_WORLD_UP, 2.0f);
+        // Rotate(modelMat, RAMEN_WORLD_RIGHT, 3.0f);
+        // Vec3f rotVector{ 1.0f, 1.0f, 1.0f };
+        // rotVector = Normalize(rotVector);
+        // Rotate(modelMat, rotVector, 1.0f);
+
         /* Projection mat */
         float aspect  = (float)windowWidth / (float)windowHeight;
-        Mat4f projMat = PerspectiveProjection(TO_RAD(70.0f), aspect, 0.01f, 500.0f);
+        Mat4f projMat = PerspectiveProjection(TO_RAD(60.0f), aspect, 0.01f, 500.0f);
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -124,7 +175,7 @@ int main(int argc, char** argv)
 
         /* Rendering */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(1.0f, 0.95f, 0.0f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 
         shader.Use();
         glBindVertexArray(VAO);
