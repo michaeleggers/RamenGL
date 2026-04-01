@@ -8,8 +8,18 @@ einige Annahmen aus task02. Clonen Sie das Rahmenprogramm deshalb
 unbedingt neu, damit Sie aus task02 nichts kaputt machen.**
 
 Nutzen Sie das Sourcefile `task03.cpp` um die Aufgaben zu implementieren.
-Kompilieren Sie es zunächst und testen Sie, ob es sich starten lässt
-und Sie ein Koordinatensystem sehen.
+Kompilieren Sie es zunächst.
+Starten Sie das Programm mit dem `assets/` Pfad als Argument, also, zB:
+```bash
+./build/task03 assets/
+```
+auf UNIX. Und
+```bash
+build\Debug\task03.exe assets\
+```
+auf Windows. Sie können auch absolute Pfade angeben.
+Sie sollten nun ein Koordinatensystem sehen, welches
+alle drei Achsen rot eingefärbt hat.
 
 ## 3.1) Nutzen der Farbattribute.
 Alle drei Achsen des Koordinatensystems werden im Moment in rot
@@ -167,6 +177,16 @@ nutzen, wenn Ihnen das lieber ist.
 ## 3.8) Ship It.
 Nutzen Sie das Script `shipit.sh` auf UNIX, bzw. `shipit.bat` auf Windows,
 um einen Release-build Ihres Programms zu erstellen und es mit den assets
-zu zippen.  
-**HINWEIS**: Das Skript wird noch nachgeliefert! Achten Sie auf
-Ankündigungen im Moodle-Kurs.
+zu zippen.
+
+**UNIX**:
+```bash
+./shipit.sh tasks_src/task03/
+```
+**Windows**:
+```bash
+shipit.bat tasks_src\task03\
+```
+
+Die gezippte Exe mitsamt libraries und `assets/` Ordner
+ist nun im `release_build/` Ordner zu finden.
