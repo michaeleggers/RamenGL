@@ -1,7 +1,7 @@
 # Task 04 - Texturen
 
 ## 4.0) Setup
-Clonen Sie das aktuelle Rahmenprogramm aus GitLab.
+Clonen Sie das aktuelle Rahmenprogramm.
 
 Nutzen Sie das Sourcefile `task04.cpp` in `./tasks_src/` um die Aufgaben zu implementieren.
 Kompilieren Sie es zunächst.
@@ -17,7 +17,7 @@ auf Windows. Sie können auch absolute Pfade angeben.
 Führen Sie ausserdem das `setup.sh` bzw. `setup.bat` Skript
 aus, damit Sie die neuen Assets bekommen.
 
-Das Fenster sollte sich öffnen, Sie sehen allerdings noch keine Grafik.
+Sie sollten ein rotes Quadrat sehen.
 
 ## 4.1) Hinzufügen von Texturkoordinaten zu einem 'Quad'
 In `task04.cpp` sind bereits Vertices und Indices für einen 'Quad'
@@ -40,16 +40,15 @@ glTextureParameteri(textureHandle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 glTextureParameteri(textureHandle, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 glTextureParameteri(textureHandle, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 glTextureStorage2D(textureHandle, 1, GL_RGBA8, image.GetWidth(), image.GetHeight());
-glTextureSubImage2D(
-    textureHandle, 0, 0, 0, image.GetWidth(), image.GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, image.Data());
+glTextureSubImage2D(textureHandle, 0, 0, 0, image.GetWidth(), image.GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, image.Data());
 ```
 Finden Sie heraus, was die einzelnen Befehle bewirken und nehmen Sie
 die Erkenntnisse in Ihre Dokumentation mit auf.
 
 ## 4.3) Zugänglich machen der Texturkoordinaten im Shader
-'Verdrahten' Sie nun das Texturkoordinaten-Attribut ihrem VAO zu, sodass
-die Texturkoordinaten im Shader verfügbar werden. Ermöglichen Sie ausserdem
-die Weiterleitung der Texturkoordinaten aus dem Vertex- in den Fragmentshader.
+'Verdrahten' Sie nun das Texturkoordinaten-Attribut über das VAO
+mit dem Vertex-Shader, sodass die Texturkoordinaten im in diesem verfügbar werden. Ermöglichen Sie ausserdem
+die Weiterleitung der Texturkoordinaten aus dem Vertex- in den Fragment-Shader.
 
 ## 4.4) Samplen der OpenGL Textur im Fragment-Shader
 Nun müssen Sie noch mithilfe der Texturkoordinaten und der OpenGL-Textur
@@ -80,8 +79,12 @@ Nehmen Sie die Erkenntnisse in Ihre Dokumentation mit auf.
 
 ## 4.5) Texturkoordinaten für die Kugel erstellen
 Nutzen Sie die Kugel, die Sie in task03 erstellt haben und
-weisen Sie dieser so Texturkoordinaten zu, sodass sich ein
-Weltkarte auf diese 'mappen' lässt. Verfahren Sie dann mit dem
-Rendering wie oben.
+weisen Sie dieser so Texturkoordinaten zu, sodass sich eine
+Weltkarte auf diese 'mappen' lässt. Rendern Sie die Kugel.
+
+## 4.6.) Rotation der Kugel
+Ermöglichen Sie die Rotation der Kugel mithilfe
+der Pfeiltasten, sodass Sie die Kugel von allen
+Blickwinkeln betrachten können.
 
 
