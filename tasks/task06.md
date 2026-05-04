@@ -1,5 +1,7 @@
 # Task 06 - Shadowmapping, Teil 1
 
+![Shadowmapping Beispiel](./img/shadowmapping_no_pcf.jpg)
+
 Diese Aufgabe baut auf Task 05 auf, nutzen Sie also ihr bestehendes Programm
 aus der vorhergegangenen Aufgabe.
 
